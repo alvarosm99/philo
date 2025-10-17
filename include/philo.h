@@ -10,19 +10,15 @@
 # include <sys/wait.h>
 # include <sys/resource.h>
 # include <sys/time.h>
+#include <string.h>
 # include <pthread.h>
 
 /************ Instructions ************/
 void	instructions (void);
 
 /************** Structs ***************/
-/* Fork Struct */
-typedef struct	s_fork
-{
-	int				id;
-	int				in_use;
-	pthread_mutex_t	fork_mutex;
-}	t_fork;
+
+typedef struct	s_philo	t_philo;
 
 /* Rules Struct */
 typedef struct	s_rules
@@ -32,43 +28,51 @@ typedef struct	s_rules
 	int				time_to_eat;
 	int				time_to_sleep;
 	long			start_time;
+	int				threads_ready;
 	int				stop;
+	pthread_mutex_t	*forks; // Array of fork mutexes (size = n_philo)
 	pthread_mutex_t	print_mutex; // Mutex to serialize printing to not corrupt the printing
-	pthread_mutex_t start_mutex;
-	pthread_mutex_t	stop_mutex;
-	t_fork			*forks; // Array of fork mutexes (size = n_philo)
-}	t_rules;
+	pthread_mutex_t stop_mutex;
+	pthread_mutex_t	data_mutex;
+	pthread_t		monitor;
+	t_philo			*philo;
+}					t_rules;
 
 /* Philosopher Struct */
 typedef struct	s_philo
 {
+	pthread_t		thrd;
 	int				id;
 	int				times_eaten;
 	long			last_meal;
-	pthread_t		thrd;
+	int				dead;
+	int				eating;
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	meal_mutex;
-	t_fork			*left_fork;
-	t_fork			*right_fork;
+	pthread_mutex_t	philo_mutex;
 	t_rules			*rules;
-}	t_philo;
+}					t_philo;
 
 /************** Functions *************/
 /* Philo */
 void	*death_checker(void *args);
+void	init_routine(t_rules *rules);
 void	*routine(void *args);
+void	*death_checker(void *args);
+void	*death_checker_utils(t_philo *philo, t_rules *rules, long *last_meal, long *current);
+void	clean_all(t_rules *rules);
 
 /* Utils Data */
-int		parse_args(char** argv, t_rules *rules);
+int		args_check(int argc, char **argv);
+void	*smalloc(size_t bytes);
+void	*init_data(char** argv, t_rules *rules);
 
 /* Utils Functions */
 int		ft_atoi(char *str);
 long	get_time(void);
-void	ft_usleep_ms(t_rules *rules, long ms);
-void	safe_print(t_rules *rules, int philo_id, const char *msg);
-void	cleanup(t_rules *rules, t_philo *philos);
-
-/* Utils Philo */
-t_philo *philo_init(t_rules *rules);
-void	free_philo(t_philo *philo);
+void	ft_sleep(t_philo *philo, int ms);
+void	safe_print(t_philo *philo, int id, const char *msg);
+long	timestamp_ms(long start);
 
 #endif

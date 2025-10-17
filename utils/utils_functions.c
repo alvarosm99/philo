@@ -34,50 +34,49 @@ long	get_time(void)
 	return (time);
 }
 
-void ft_usleep_ms(t_rules *rules, long ms)
+long	timestamp_ms(long start)
 {
-    long start = get_time(); // get_time_ms debe devolver ms
-    while (1)
-    {
-        // Si stop se ha activado, salimos pronto
-        pthread_mutex_lock(&rules->stop_mutex);
-        int stop = rules->stop;
-        pthread_mutex_unlock(&rules->stop_mutex);
-        if (stop)
-            return;
-
-        if ((get_time() - start) >= ms)
-            break;
-        usleep(500); // duerme 500 microsegundos (0.5 ms)
-    }
+	return (get_time() - start);
 }
 
-void safe_print(t_rules *rules, int philo_id, const char *msg)
+void	ft_sleep(t_philo *philo, int ms)
 {
-    pthread_mutex_lock(&rules->print_mutex);
-    // Revisamos stop para no imprimir mensaje después del died final
-    pthread_mutex_lock(&rules->stop_mutex);
-    int stop = rules->stop;
-    pthread_mutex_unlock(&rules->stop_mutex);
+	long	end;
+	long	now;
 
-    if (!stop)
-    {
-        long timestamp = get_time() - rules->start_time;
-        printf("%ld %d %s\n", timestamp, philo_id, msg);
-    }
-    pthread_mutex_unlock(&rules->print_mutex);
+	end = get_time() + ms;
+	while (1)
+	{
+		now = get_time();
+		if (now >= end)
+			break;
+		pthread_mutex_lock(&philo->rules->stop_mutex);
+		if (philo->rules->stop)
+		{
+			pthread_mutex_unlock(&philo->rules->stop_mutex);
+			break;
+		}
+		pthread_mutex_unlock(&philo->rules->stop_mutex);
+		//usleep(100);
+	}
 }
 
-void cleanup(t_rules *rules, t_philo *philos)
+void	clean_all(t_rules *rules)
 {
-    for (int i = 0; i < rules->n_philo; ++i)
-    {
-        pthread_mutex_destroy(&rules->forks[i].fork_mutex);
-        pthread_mutex_destroy(&philos[i].meal_mutex);
-    }
-    pthread_mutex_destroy(&rules->print_mutex);
-    pthread_mutex_destroy(&rules->stop_mutex);
-    pthread_mutex_destroy(&rules->start_mutex);
-    free(rules->forks);
-    free(philos);
+	int	i;
+
+	pthread_mutex_destroy(&rules->print_mutex);
+	pthread_mutex_destroy(&rules->stop_mutex);
+	pthread_mutex_destroy(&rules->data_mutex);
+	i = 0;
+	while (i < rules->n_philo)
+	{
+		pthread_mutex_destroy(&rules->philo[i].philo_mutex);
+		pthread_mutex_destroy(&rules->philo[i].meal_mutex);
+		pthread_mutex_destroy(&rules->forks[i]);
+		i++;
+	}
+	free(rules->philo);
+	free(rules->forks);
+	free(rules);
 }
