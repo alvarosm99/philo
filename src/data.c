@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   data.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: asalguer <asalguer@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/17 17:50:57 by asalguer          #+#    #+#             */
+/*   Updated: 2025/10/17 17:51:16 by asalguer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/philo.h"
 
 int	args_check(int argc, char **argv)
@@ -7,8 +19,8 @@ int	args_check(int argc, char **argv)
 		instructions();
 		return (1);
 	}
-	if (ft_atoi(argv[1]) < 0 || ft_atoi(argv[2]) < 0 || \
-	ft_atoi(argv[3]) < 0 || ft_atoi(argv[4]) < 0)
+	if (ft_atoi(argv[1]) < 0 || ft_atoi(argv[2]) < 0 || ft_atoi(argv[3]) < 0
+		|| ft_atoi(argv[4]) < 0)
 	{
 		printf("Error: Arguments must be possitive numbers.\n");
 		return (2);
@@ -19,26 +31,14 @@ int	args_check(int argc, char **argv)
 
 void	*smalloc(size_t bytes)
 {
-	void *memory;
+	void	*memory;
 
 	memory = malloc(bytes);
 	if (memory == NULL)
 		printf("Error: malloc couldn't allocate enough memory\n");
 	return (memory);
 }
-/*
-void	give_fork(t_rules *rules, t_philo *philo, int id)
-{
-	if (id == 0)
-	{
-		philo->right_fork = &rules->forks[0];
-		philo->left_fork = &rules->forks[(rules->n_philo - 1)];
-		return ;
-	}
-	philo->right_fork = &rules->forks[id];
-	philo->left_fork = &rules->forks[(id - 1)];
-}
-*/
+
 t_philo	*init_philo(t_rules *rules)
 {
 	t_philo	*philo;
@@ -62,9 +62,9 @@ t_philo	*init_philo(t_rules *rules)
 	return (philo);
 }
 
-void	*init_data(char** argv, t_rules *rules)
+void	*init_data(char **argv, t_rules *rules)
 {
-	int i;
+	int	i;
 
 	memset(rules, 0, sizeof(*rules));
 	rules->n_philo = ft_atoi(argv[1]);

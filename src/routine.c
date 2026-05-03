@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: asalguer <asalguer@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/17 17:41:27 by asalguer          #+#    #+#             */
+/*   Updated: 2025/10/17 17:51:39 by asalguer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/philo.h"
 
 static void	set_initial_time(t_rules *rules)
 {
-	int i;
+	int	i;
 
 	rules->start_time = get_time();
 	i = 0;
@@ -36,7 +48,7 @@ void	*one_philo_routine(t_philo *philo)
 
 void	init_routine(t_rules *rules)
 {
-	int i;
+	int	i;
 
 	one_philo_routine(&rules->philo[0]);
 	if (rules->stop == 1)
@@ -58,7 +70,8 @@ void	init_routine(t_rules *rules)
 	pthread_join(rules->monitor, NULL);
 }
 
-void	*death_checker_utils(t_philo *philo, t_rules *rules, long *last_meal, long *current)
+void	*death_checker_utils(t_philo *philo, t_rules *rules, long *last_meal,
+		long *current)
 {
 	int	i;
 
@@ -74,9 +87,7 @@ void	*death_checker_utils(t_philo *philo, t_rules *rules, long *last_meal, long 
 			pthread_mutex_lock(&rules->stop_mutex);
 			if (!rules->stop)
 			{
-				pthread_mutex_lock(&rules->print_mutex);
-				printf("%ld %i died\n", *current - rules->start_time, philo[i].id);
-				pthread_mutex_unlock(&rules->print_mutex);
+				safe_print(philo, philo[i].id, "died");
 				rules->stop = 1;
 			}
 			pthread_mutex_unlock(&rules->stop_mutex);
@@ -89,10 +100,10 @@ void	*death_checker_utils(t_philo *philo, t_rules *rules, long *last_meal, long 
 
 void	*death_checker(void *args)
 {
-	long    last_meal;
-	long    current;
-	t_philo *philo;
-	t_rules *rules;
+	long	last_meal;
+	long	current;
+	t_philo	*philo;
+	t_rules	*rules;
 
 	philo = (t_philo *)args;
 	rules = philo[0].rules;

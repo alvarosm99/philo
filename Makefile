@@ -10,7 +10,8 @@ SRCS =  src/main.c \
 
 OBJS = $(SRCS:.c=.o)
 
-CFLAGS = -Wall -Werror -Wextra -lpthread
+CFLAGS = -Wall -Werror -Wextra 
+LIBS = -lpthread
 
 CC = cc
 

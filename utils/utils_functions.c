@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_functions.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: asalguer <asalguer@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/17 17:52:12 by asalguer          #+#    #+#             */
+/*   Updated: 2025/10/17 17:55:21 by asalguer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/philo.h"
 
 int	ft_atoi(char *str)
@@ -26,17 +38,12 @@ int	ft_atoi(char *str)
 
 long	get_time(void)
 {
-	struct	timeval current_time;
-	long	time;
-	
+	struct timeval	current_time;
+	long			time;
+
 	gettimeofday(&current_time, NULL);
 	time = current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
 	return (time);
-}
-
-long	timestamp_ms(long start)
-{
-	return (get_time() - start);
 }
 
 void	ft_sleep(t_philo *philo, int ms)
@@ -49,15 +56,14 @@ void	ft_sleep(t_philo *philo, int ms)
 	{
 		now = get_time();
 		if (now >= end)
-			break;
+			break ;
 		pthread_mutex_lock(&philo->rules->stop_mutex);
 		if (philo->rules->stop)
 		{
 			pthread_mutex_unlock(&philo->rules->stop_mutex);
-			break;
+			break ;
 		}
 		pthread_mutex_unlock(&philo->rules->stop_mutex);
-		//usleep(100);
 	}
 }
 
